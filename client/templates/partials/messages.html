@@ -1,0 +1,14 @@
+<template name="appMessages">
+  <div class="errors">
+    {{#each appMessages}}
+      {{> appMessage}}
+    {{/each}}
+  </div>
+</template>
+
+<template name="appMessage">
+  <div class="alert alert-{{messageType}}" role="alert">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{message}}
+  </div>
+</template>

@@ -1,0 +1,129 @@
+<template name="services">
+	<div class="page-header">
+		<h1>{{companyName}} - {{companyId}}</h1>
+	</div>
+
+	<a href="">Add Edit Service</a>
+
+	<div class="btn-group pull-right">
+		<a href="#services-allocation" id="allocation" class="btn btn-default" data-toggle="pill">Allocation</a>
+		<a href="#services-details" id="details" class="btn btn-default" data-toggle="pill">Details</a>
+	</div>
+
+	<div class="tab-content">
+		<div class="tab-pane active" id="services-allocation">{{>servicesTable}}</div>
+		<div class="tab-pane" id="services-details">{{>servicesTableDetails}}</div>
+	</div>
+
+	{{>addService}}
+
+	{{>requestService}}
+</template>
+
+
+<template name="servicesTable">
+	
+	<table class="table table-striped table-bordered">
+	<thead>
+		<tr>
+			<td>Logo</td>
+			<td>Service</td>
+			<td>ID</td>
+			<td>Monthly fee</td>
+			<td>Service Allocation</td>
+			{{#each projects}}
+				<td>{{this.projectName}}</td>
+			{{/each}}
+		</tr>
+	</thead>
+	<tbody>
+	{{#each services}}
+		<tr>
+			<td>{{logo}}</td>
+			<td>{{serviceName}}</td>
+			<td>{{ID}}</td>
+			<td>${{fee}}</td>
+			<td>{{serviceAllocation}}</td>
+
+			{{#each project}}
+					<td id="projectAllocation-{{this.projectId}}-{{../_id}}" class="project-allocation">{{this.projectAllocation}}%
+					<input style="display:none" type="text" id="allocate-{{this.projectId}}-{{../_id}}" class="allocate-input" placeholder="{{this.projectAllocation}}%"/>
+					</td>
+			{{/each}}
+		</tr>
+	{{/each}}
+	</tbody>
+	</table>
+</template>
+
+<template name="servicesTableDetails">
+
+	<table class="table table-striped table-bordered">
+		<thead>
+		<tr>
+			<td>Logo</td>
+			<td>Service</td>
+			<td>ID</td>
+			<td>Monthly fee</td>
+			<td>Start Date</td>
+			<td>Username</td>
+			<td>Website</td>
+		</tr>
+	</thead>
+	<tbody>
+	{{#each services}}
+	
+		<tr>
+			<td>{{logo}}</td>
+			<td>{{serviceName}}</td>
+			<td>{{ID}}</td>
+			<td>{{fee}}</td>
+			<td>{{startDate}}</td>
+			<td>{{username}}</td>
+			<td>{{website}}</td>
+		</tr>
+	{{/each}}
+	</tbody>
+	</table>
+
+</template>
+
+
+
+<template name="addService">
+	<form id="addService">
+		<div class="form-group">
+			<label for="serviceName" class="control-label">Service Name</label>
+			<input name="serviceName" id="serviceName" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="logo" class="control-label">Logo</label>
+			<input name="logo" id="logo" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="fee" class="control-label">Monthly Fee</label>
+			<input name="fee" id="fee" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="ID" class="control-label">ID</label>
+			<input name="ID" id="ID" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="website" class="control-label">Website</label>
+			<input name="website" id="website" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="username" class="control-label">Username</label>
+			<input name="username" id="username" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="companyId" class="control-label">Company ID</label>
+			<input name="companyId" id="companyId" type="text" class="form-control" />
+		</div>
+		<button class="btn btn-primary" type="submit">Submit</button>
+	</form>
+</template>
+
+<template name="requestService">
+	request service form goes here
+</template>
