@@ -1,6 +1,38 @@
+
+////////// Helpers for in-place editing //////////
+// Returns an event map that handles the "escape" and "return" keys and
+// "blur" events on a text input (given by selector) and interprets them
+// as "ok" or "cancel".
+//https://gist.github.com/ThomasLomas/2646535
+okCancelEvents = function(selector, callbacks) {
+    var ok = callbacks.ok || function() {};
+    var cancel = callbacks.cancel || function() {};
+
+    var events = {};
+    events['keyup ' + selector + ', keydown ' + selector] =
+        function(evt) {
+            if (evt.type === "keydown" && evt.which === 27) {
+                // escape = cancel
+                cancel.call(this, evt);
+
+            } else if (evt.type === "keyup" && evt.which === 13 || evt.type === "focusout") {
+                // blur/return/enter = ok/submit if non-empty
+
+                var value = String(evt.target.value || "");
+                if (value)
+                    ok.call(this, value, evt);
+                else
+                    cancel.call(this, evt);
+            }
+    };
+
+    return events;
+};
+
 Template.addService.events({
 	'submit form': function(event, template) {
 		event.preventDefault();
+		var companyId = template.find('#companyId').value;
 		var data = {
 			serviceName: template.find('#serviceName').value,
 			logo: template.find('#logo').value,
@@ -11,16 +43,59 @@ Template.addService.events({
 			website: template.find('#website').value,
 			username: template.find('#username').value
 		}
-		Meteor.call('addService', data);
-
-
-
-		//TODO:  when service is added,  all existing projects need to be added to it as well
+		Meteor.call('addService', data, function(err, result) {
+			console.log(result);
+			if(!err) {
+				//add all existing projects to the service
+				var project = Projects.find({companyId: companyId});
+				if(project) {
+					project.forEach(function(p) {
+						Meteor.call('addProjectToService', result, p.projectName, p._id);
+					});  
+				}
+			}
+		});
 	}
 });
 
+Template.servicesTable.events(okCancelEvents(  
+    '.allocate-input', {
+        ok: function (txt, event) {
+           	var el = event.currentTarget;
+			var str = $(el).attr('id');
+			var idParts = str.split('-');
+			var projectId = idParts[1];
+			var serviceId = idParts[2];
+
+
+			var thisService = Services.findOne({_id: serviceId});
+
+			_.each(thisService.projects, function (project, idx) { 
+
+				var obj = {};
+				obj['projects.'+idx+'.projectAllocation'] = parseInt(event.currentTarget.value);
+		
+
+
+				if(project.projectId == idParts[1]) {
+					//need to find index of object
+					var p = 'projects[idx].projectAllocation'
+					Services.update({_id: serviceId}, {$set:obj});
+				}
+
+			});
+
+
+			$('.allocate-input').hide();
+
+
+        }
+}));
+
+
 Template.servicesTable.events({
 	'blur .allocate-input': function(event, template) {  //todo:  make it so this works on enter key as well
+		//http://stackoverflow.com/questions/13010151/input-text-return-event-in-meteor
 
 		var el = event.currentTarget;
 		var str = $(el).attr('id');
@@ -49,7 +124,7 @@ Template.servicesTable.events({
 		//Session.set('allocateProject', thisOne);
 		//Meteor.call('setProjectAllocation', id, allocation);
 
-	},
+	}, 
 	'click .project-allocation': function(event, template) {
 
 		var el = event.currentTarget;
@@ -84,9 +159,11 @@ Template.servicesTable.helpers({
 		var projectsArr = [];
 		services.forEach(function(service) {
 
-			service.projects.forEach(function(project) {
-				projectsArr.push(project.projectId);  //TODO, can we do this without pushing inside the double loop.  should only need to push once
-			});
+			if(service.projects) {
+				service.projects.forEach(function(project) {
+					projectsArr.push(project.projectId);  //TODO, can we do this without pushing inside the double loop.  should only need to push once
+				});
+			}
 
 		});
 		var uniqueArr = _.uniq(projectsArr);
@@ -96,20 +173,25 @@ Template.servicesTable.helpers({
 	},
 	project: function() {
 		var projects = [];
-		this.projects.forEach(function(project) {
-			
-			projects.push(project);
-		});
+		if(this.projects) {
+			this.projects.forEach(function(project) {
+				
+				projects.push(project);
+			});
 
-		return projects;
+			return projects;
+		}
 	},
 	serviceAllocation: function() {
 		var allocationSum = 0;
-		this.projects.forEach(function(project) {
+		if(this.projects) {
+			this.projects.forEach(function(project) {
 			//console.log(project.projectAllocation);
-			allocationSum += project.projectAllocation;
-		});
-		return allocationSum+'%';
+				allocationSum += project.projectAllocation;
+			});
+			return allocationSum+'%';
+		}
+		
 	}
 
 });

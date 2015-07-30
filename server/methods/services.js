@@ -1,5 +1,5 @@
 Meteor.methods({
   addService: function(data){
-    Services.insert(data);
+    return Services.insert(data);
   }
  });

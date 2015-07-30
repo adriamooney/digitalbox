@@ -9,7 +9,8 @@ Template.addProject.events({
 			projectName: projectName,
 			projectNumber: template.find('#projectNumber').value,
 			client: template.find('#client').value,
-			companyId: companyId
+			companyId: companyId,
+			isActive: true
 		}
 
 		Meteor.call('addProject', data, function(err, result) {
@@ -23,3 +24,28 @@ Template.addProject.events({
 
 	}
 });
+
+Template.projects.events({
+	'click #add-project': function() {
+		Modal.show('addProject');
+	}
+});
+
+Template.projectsTable.helpers({
+	projects: function() {
+		var companyId = Meteor.user().profile.companyId;
+		var projects = Projects.find({companyId: companyId});
+		console.log(projects.count());
+		return projects;
+	},
+	activeCheckBox: function() {
+		console.log(this);
+		if(this.isActive) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+})
