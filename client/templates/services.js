@@ -19,7 +19,8 @@ Template.addService.events({
 				var project = Projects.find({companyId: companyId});
 				if(project) {
 					project.forEach(function(p) {
-						Meteor.call('addProjectToService', result, p.projectName, p._id);
+						//for each project, add it to this service
+						Meteor.call('addProjectToService', result, p.projectName, p._id, p.isActive);
 					});  
 				}
 			}
@@ -50,8 +51,10 @@ Template.servicesTable.events(Meteor.helpers.okCancelEvents(
 
 				if(project.projectId == idParts[1]) {
 					//need to find index of object
-					var p = 'projects[idx].projectAllocation'
-					Services.update({_id: serviceId}, {$set:obj});
+					var p = 'projects[idx].projectAllocation';
+
+					Meteor.call('updateServiceProject', serviceId, obj);
+					//Services.update({_id: serviceId}, {$set:obj});
 				}
 
 			});
@@ -88,20 +91,18 @@ Template.servicesTable.events({
 			if(project.projectId == idParts[1]) {
 				//need to find index of object
 				var p = 'projects[idx].projectAllocation'
-				Services.update({_id: serviceId}, {$set:obj});
+				Meteor.call('updateServiceProject', serviceId, obj);
 			}
 
 		});
-		//Session.set('allocateProject', thisOne);
-		//Meteor.call('setProjectAllocation', id, allocation);
+		
+		$('.allocate-input').hide();
 
 	}, 
 	'click .project-allocation': function(event, template) {
 
 		var el = event.currentTarget;
 		var str = $(el).attr('id');
-
-		//Session.set('allocateProject', str);
 
 		$('.allocate-input').hide();
 
@@ -132,13 +133,16 @@ Template.servicesTable.helpers({
 
 			if(service.projects) {
 				service.projects.forEach(function(project) {
+					
 					projectsArr.push(project.projectId);  //TODO, can we do this without pushing inside the double loop.  should only need to push once
+					
+					
 				});
 			}
 
 		});
 		var uniqueArr = _.uniq(projectsArr);
-		var projects = Projects.find({_id: {$in: uniqueArr}});
+		var projects = Projects.find({_id: {$in: uniqueArr}, isActive:true});
 		return projects;
 
 	},
@@ -146,19 +150,24 @@ Template.servicesTable.helpers({
 		var projects = [];
 		if(this.projects) {
 			this.projects.forEach(function(project) {
+
+				if(project.isActive == true) {
+					projects.push(project);
+				}
 				
-				projects.push(project);
 			});
 
 			return projects;
 		}
-	},
+	}, 
 	serviceAllocation: function() {
 		var allocationSum = 0;
 		if(this.projects) {
 			this.projects.forEach(function(project) {
-			//console.log(project.projectAllocation);
-				allocationSum += project.projectAllocation;
+				if (project.isActive == true) {
+					allocationSum += project.projectAllocation;
+				}
+				
 			});
 			return allocationSum+'%';
 		}
@@ -189,5 +198,11 @@ Template.services.helpers({
 	companyId:  function() {
 		var companyId = Meteor.user().profile.companyId;
 		return companyId;
+	}
+});
+
+Template.services.events({
+	'click #add-service': function() {
+		Modal.show('requestService');
 	}
 });

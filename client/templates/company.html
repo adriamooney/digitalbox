@@ -1,0 +1,13 @@
+<template name="company">
+	<a href="/companies" class="btn btn-default">&laquo; Back to companies</a>
+	{{>addService}}
+</template>
+
+
+<template name="companies">
+	<ul class="list-group">
+	{{#each this}}
+		<li class="list-group-item"><a href="/company/{{_id}}">{{name}}</a></li>
+	{{/each}}
+	</ul>
+</template>
