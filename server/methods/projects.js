@@ -15,6 +15,12 @@ Meteor.methods({
   },
   projectActiveStatus: function(id, activeStatus) {
   		Projects.update({_id: id}, {$set: {isActive: activeStatus}});
+  },
+  updateProject: function(id, property, value) {
+	var obj = {};
+	obj[property] = value; 
+
+  	Projects.update({_id: id}, {$set: obj});
   }
 });
 

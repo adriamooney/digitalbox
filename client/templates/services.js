@@ -28,7 +28,7 @@ Template.addService.events({
 	}
 });
 
-//TODO: needs to be combined with the blur event below.  this is duplication
+//TODO: needs to be combined with the blur event below.  this is duplication.  see example in projects.js.  is much simpler than this.
 
 Template.servicesTable.events(Meteor.helpers.okCancelEvents(  
     '.allocate-input', {

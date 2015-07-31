@@ -18,9 +18,27 @@
 		{{#each projects}}
 		<tr>
 			<td>{{#if isActive}}<input type="checkbox" checked class="active-box" />{{else}}<input type="checkbox" class="active-box" />{{/if}}</td>
-			<td>{{projectName}}</td>
-			<td>{{projectNumber}}</td>
-			<td>{{client}}</td>
+			<td class="edit-name edit-view">
+			{{#if nameSelected}}
+				<input type="text" value="{{projectName}}" class="projectName"/>
+				{{else}}
+					{{projectName}}
+			{{/if}}
+			</td>
+			<td class="edit-number edit-view">
+				{{#if numberSelected}}
+					<input type="text" value="{{projectNumber}}" class="projectNumber" />
+					{{else}}
+						{{projectNumber}}
+				{{/if}}
+			</td>
+			<td class="edit-client edit-view">
+				{{#if clientSelected}}
+					<input type="text" value="{{client}}" class="client" />
+					{{else}}
+						{{client}}
+				{{/if}}
+			</td>
 		</tr>
 		{{/each}}
 	</tbody>

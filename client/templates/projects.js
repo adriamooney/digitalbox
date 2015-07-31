@@ -43,22 +43,33 @@ Template.projectsTable.helpers({
 		return projects;
 	},
 	activeCheckBox: function() {
-		console.log(this);
 		if(this.isActive) {
 			return true;
 		}
 		else {
 			return false;
 		}
+	},
+	nameSelected: function() {
+		var session = Session.get('editName');
+		return this._id === session;
+	},
+	numberSelected: function() {
+		var session = Session.get('editNumber');
+		return this._id === session;
+	},
+	clientSelected: function() {
+		var session = Session.get('editClient');
+		return this._id === session;
 	}
 
 });
 
 Template.projectsTable.events({
 	'change .active-box': function(event, template) {
-		console.log(this._id);
-		console.log(event.target.checked);
-		projectName = this.projectName;
+		//console.log(this._id);
+		//console.log(event.target.checked);
+		//projectName = this.projectName;
 		var companyId = Meteor.user().profile.companyId;
 		var self = this;
 
@@ -82,10 +93,37 @@ Template.projectsTable.events({
 			});
 		});
 
-
 		Meteor.call('projectActiveStatus', this._id, event.target.checked);
 	},
-	'click .editView': function() {
-		Session.set('editView', this._id);
+	'focusout .edit-view, keydown .edit-view': function(event, template) {
+		if((event.type == 'keydown' && event.which == 13) || event.type == 'focusout') {
+
+			//TODO:  change the info for the service as well, as in example above
+			var val = $(event.currentTarget).find('input').val();
+
+			var property = $(event.currentTarget).find('input').attr('class');
+
+			Meteor.call('updateProject', this._id, property, val);
+
+			Session.set('editNumber', '');
+			Session.set('editClient', '');
+			Session.set('editName', '');
+		}
+	},
+	'click .edit-name': function() {
+		Session.set('editName', this._id);
+		Session.set('editClient', '');
+		Session.set('editNumber', '');
+	},
+	'click .edit-number': function() {
+		Session.set('editNumber', this._id);
+		Session.set('editClient', '');
+		Session.set('editName', '');
+	},
+	'click .edit-client': function() {
+		Session.set('editClient', this._id);
+		Session.set('editNumber', '');
+		Session.set('editName', '');
 	}
+
 });
