@@ -84,8 +84,7 @@ Template.projectsTable.events({
 	
 
 				if(project.projectId == self._id) {
-					//need to find index of object
-					var p = 'projects[idx].isActive';
+
 					//update active status of the project object within the service as well
 					Meteor.call('updateServiceProject', service._id, obj);
 				}

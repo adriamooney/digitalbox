@@ -13,7 +13,7 @@ Template.addService.events({
 			username: template.find('#username').value
 		}
 		Meteor.call('addService', data, function(err, result) {
-			console.log(result);
+			//console.log(result);
 			if(!err) {
 				//add all existing projects to the service
 				var project = Projects.find({companyId: companyId});
@@ -28,12 +28,15 @@ Template.addService.events({
 	}
 });
 
-//TODO: needs to be combined with the blur event below.  this is duplication.  see example in projects.js.  is much simpler than this.
 
-Template.servicesTable.events(Meteor.helpers.okCancelEvents(  
-    '.allocate-input', {
-        ok: function (txt, event) {
-           	var el = event.currentTarget;
+Template.servicesTable.events({
+	'focusout .allocate-input, keydown .allocate-input': function(event, template) {  
+
+		if((event.type == 'keydown' && event.which == 13) || event.type == 'focusout') {
+
+			console.log(event.which);
+
+			var el = event.currentTarget;
 			var str = $(el).attr('id');
 			var idParts = str.split('-');
 			var projectId = idParts[1];
@@ -43,71 +46,43 @@ Template.servicesTable.events(Meteor.helpers.okCancelEvents(
 			var thisService = Services.findOne({_id: serviceId});
 
 			_.each(thisService.projects, function (project, idx) { 
+				//console.log(idx);
+
+				var val = parseInt(event.currentTarget.value);
+				
 
 				var obj = {};
-				obj['projects.'+idx+'.projectAllocation'] = parseInt(event.currentTarget.value);
+				obj['projects.'+idx+'.projectAllocation'] = val;
+
 		
 
+					if(project.projectId == idParts[1]) {
 
-				if(project.projectId == idParts[1]) {
-					//need to find index of object
-					var p = 'projects[idx].projectAllocation';
+						Meteor.call('updateServiceProject', serviceId, obj);			
 
-					Meteor.call('updateServiceProject', serviceId, obj);
-					//Services.update({_id: serviceId}, {$set:obj});
-				}
+					}
+
 
 			});
-
-
+			
 			$('.allocate-input').hide();
+			$('.allocation').show();
 
-
-        }
-}));
-
-
-Template.servicesTable.events({
-	'blur .allocate-input': function(event, template) {  //todo:  make it so this works on enter key as well
-		//http://stackoverflow.com/questions/13010151/input-text-return-event-in-meteor
-
-		var el = event.currentTarget;
-		var str = $(el).attr('id');
-		var idParts = str.split('-');
-		var projectId = idParts[1];
-		var serviceId = idParts[2];
-
-
-		var thisService = Services.findOne({_id: serviceId});
-
-		_.each(thisService.projects, function (project, idx) { 
-			console.log(idx);
-
-			var obj = {};
-			obj['projects.'+idx+'.projectAllocation'] = parseInt(event.currentTarget.value);
-	
-
-
-			if(project.projectId == idParts[1]) {
-				//need to find index of object
-				var p = 'projects[idx].projectAllocation'
-				Meteor.call('updateServiceProject', serviceId, obj);
-			}
-
-		});
-		
-		$('.allocate-input').hide();
+		}
 
 	}, 
 	'click .project-allocation': function(event, template) {
 
+		//console.log(this);
+
 		var el = event.currentTarget;
 		var str = $(el).attr('id');
 
 		$('.allocate-input').hide();
+		$('.allocation').show();
 
 		$(el).find('.allocate-input').show();
-
+		$(el).find('.allocation').hide();
 		
 	} 
 

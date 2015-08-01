@@ -45,7 +45,7 @@
 				<td>{{serviceAllocation}}</td>
 
 				{{#each project}}
-						<td id="projectAllocation-{{this.projectId}}-{{../_id}}" class="project-allocation">{{this.projectAllocation}}%
+						<td id="projectAllocation-{{this.projectId}}-{{../_id}}" class="project-allocation"><span class="allocation">{{this.projectAllocation}}%</span>
 						<input style="display:none" type="text" id="allocate-{{this.projectId}}-{{../_id}}" class="allocate-input" placeholder="{{this.projectAllocation}}%"/>
 						</td>
 				{{/each}}
