@@ -1,0 +1,25 @@
+
+<template name="invoice">
+	<div class="page-header">
+		<h1>Invoice for {{name}}</h1>
+	</div>
+
+<h4>Projects</h4>
+
+{{>invoiceTable}}
+
+</template>
+
+
+<template name="invoiceTable">
+
+
+<ul>
+{{#each project}}
+	<li>{{projectName}}  ${{projectFee}}</li>
+{{/each}}
+</ul>
+
+Total: ${{total}}
+
+</template>

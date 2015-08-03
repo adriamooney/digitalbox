@@ -19,7 +19,7 @@
 
             <li><a href="/services">Digital Services</a></li>
             <li><a href="/projects">Projects</a></li>
-            <li><a href="/companies">Companies</a></li>
+            {{#if isSuperAdmin}}<li><a href="/companies">Companies</a></li>{{/if}}
             <li><a href="/account/{{currentUser.profile.companyId}}">Account Info</a></li>
 
             {{#if currentUser}}<li><a href="/sign-out">Sign Out</a></li>{{/if}}

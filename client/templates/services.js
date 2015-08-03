@@ -6,7 +6,7 @@ Template.addService.events({
 			serviceName: template.find('#serviceName').value,
 			logo: template.find('#logo').value,
 			startDate: new Date(),
-			fee: template.find('#fee').value,
+			fee: Number(template.find('#fee').value),
 			companyId: template.find('#companyId').value,
 			ID: template.find('#ID').value,
 			website: template.find('#website').value,
@@ -48,7 +48,7 @@ Template.servicesTable.events({
 			_.each(thisService.projects, function (project, idx) { 
 				//console.log(idx);
 
-				var val = parseInt(event.currentTarget.value);
+				var val = Number(event.currentTarget.value);
 				
 
 				var obj = {};
@@ -84,7 +84,10 @@ Template.servicesTable.events({
 		$(el).find('.allocate-input').show();
 		$(el).find('.allocation').hide();
 		
-	} 
+	},
+	'click .remove-service': function() {
+		Meteor.call('removeService', this._id);
+	}
 
 });
 
@@ -147,8 +150,37 @@ Template.servicesTable.helpers({
 			return allocationSum+'%';
 		}
 		
-	}
+	},
+	totalServices: function() {
+		var companyId = Meteor.user().profile.companyId;
+		var services = Services.find({companyId: companyId});
+		var servicesSum = 0;
+		services.forEach(function(service) {
+			servicesSum += service.fee;
+		});
+		return servicesSum;
+	},
+	totalProject: function() {
 
+		var services = Services.find({companyId: this.companyId});
+		var self = this;
+		var projectSum = 0;
+		services.forEach(function(service) {
+			if(service.projects) {
+
+				var projectVal = _.where(service.projects, {projectId: self._id});
+	
+				var percentage = projectVal[0].projectAllocation / 100;   //percentage
+
+				var amt = service.fee * percentage;
+				
+				projectSum += amt;
+				
+			}
+			
+		});
+		return projectSum;
+	}
 });
 
 Template.servicesTableDetails.helpers({

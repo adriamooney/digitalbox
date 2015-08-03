@@ -11,7 +11,7 @@
 <template name="companies">
 	<ul class="list-group">
 	{{#each this}}
-		<li class="list-group-item">{{name}} <a href="/service/{{_id}}" class="label label-info">+ Add Service</a>  <a href="/account/{{_id}}" class="label label-default">Account Info</a></li>
+		<li class="list-group-item">{{name}} <a href="/service/{{_id}}" class="label label-info">+ Add Service</a>  <a href="/account/{{_id}}" class="label label-default">Account Info</a>  <a href="/invoice/{{_id}}" class="label label-primary">Invoice</a></li>
 	{{/each}}
 	</ul>
 </template>

@@ -6,13 +6,12 @@ Accounts.onCreateUser(function(options, user) {
 
     options.profile.isActive = true;
 
-    Companies.insert({companyId: user._id, name: options.profile.company}, function(err, doc) {
-        console.log(doc);
-        //options.profile.companyId = doc;
-        Meteor.users.update({_id: user._id}, {$set: {'profile.companyId': doc}});
-    });
-
-    
+    if(!options.profile.companyId) {
+        Companies.insert({companyId: user._id, name: options.profile.company}, function(err, doc) {
+            //console.log(doc);
+            Meteor.users.update({_id: user._id}, {$set: {'profile.companyId': doc}});
+        });
+    }
 
     if (options.profile) {
         user.profile = options.profile;
@@ -35,3 +34,4 @@ Accounts.onCreateUser(function(options, user) {
 Accounts.config({sendVerificationEmail: true});
  */
 
+//Accounts.config({sendVerificationEmail: true});

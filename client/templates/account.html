@@ -2,9 +2,21 @@
 	<div class="page-header">
 		<h1>Account Info</h1>
 	</div>
-	
 
-		<table class="table table-bordered table-striped table-condensed">
+	<h4>{{this.name}}</h4>
+
+	<p>Account email<br />{{currentUser.emails.[0].address}}</p>
+
+	
+		{{>accountsTable}}
+		
+
+		{{#if isAdmin}}{{>addUser}}{{/if}}
+
+</template>
+
+<template name="accountsTable">
+	<table class="table table-bordered table-striped table-condensed">
 			<thead>
 				<tr>
 					<td>First Name</td>
@@ -22,13 +34,49 @@
 					<td>{{profile.lastName}}</td>
 					<td>{{emails.[0].address}}</td>
 					<td>{{verified}}</td>
-					<td>{{profile.lastActiveOn}}</td>
-					<td>role</td>
+					<td>{{lastLogin}}</td>
+					<td class="edit-role edit-view">{{#if roleSelected}}
+							<select class="role">
+								<option value="select">select role</option>
+								<option value="admin">admin</option>
+								<option value="read">read</option>
+							</select>
+						{{else}}
+							{{profile.role}}
+						{{/if}}
+					</td>
 				</tr>
 				{{/each}}
 
 			</tbody>
 		</table>
+</template>
 
 
+
+
+<template name="addUser">
+
+	<form id="addUser">
+		<div class="form-group">
+			<label for="email" class="control-label">Email</label>
+			<input name="email" id="email" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="firstName" class="control-label">First Name</label>
+			<input name="firstName" id="firstName" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="lastName" class="control-label">Last Name</label>
+			<input name="lastName" id="lastName" type="text" class="form-control" />
+		</div>
+		<div class="form-group">
+			<label for="role" class="control-label">Access</label>
+			<select id="role" name="role" class="form-control">
+				<option value="admin">Admin</option>
+				<option value="read">Read</option>
+			</select>
+		</div>
+		<button class="btn btn-primary" type="submit">Submit</button>
+	</form>
 </template>
